@@ -99,66 +99,70 @@
     const scaryImg = document.getElementById("scaryImg");
     const messageDiv = document.getElementById("message");
     const inputBox = document.getElementById("response");
-    let lineIndex = 0;
 
-    function showLine() {
-      if (lineIndex < lines.length) {
+    async function fadeInLine(text) {
+      return new Promise(resolve => {
         const lineEl = document.createElement("div");
         lineEl.className = "line";
-        lineEl.textContent = lines[lineIndex];
+        lineEl.textContent = text;
         messageDiv.appendChild(lineEl);
-
         setTimeout(() => { lineEl.style.opacity = 1; }, 100);
+        setTimeout(resolve, 2000);
+      });
+    }
 
-        lineIndex++;
-        setTimeout(showLine, 2000);
-      } else {
-        // After all lines, show input for typing first
-        inputBox.style.display = "block";
-        inputBox.focus();
+    async function showLines() {
+      for (let line of lines) {
+        await fadeInLine(line);
+      }
+      // Show input box after lines
+      inputBox.style.display = "block";
+      inputBox.focus();
+    }
 
-        inputBox.addEventListener("keydown", function(e) {
+    function waitForInput() {
+      return new Promise(resolve => {
+        inputBox.addEventListener("keydown", function handler(e) {
           if (e.key === "Enter" && inputBox.value.trim() !== "") {
-            inputBox.disabled = true; // prevent more typing
+            inputBox.disabled = true;
             inputBox.style.opacity = 0.5;
-            setTimeout(showScreenshots, 500); // start screenshots after typing
+            inputBox.removeEventListener("keydown", handler);
+            resolve();
           }
         });
+      });
+    }
+
+    async function showScreenshots() {
+      for (let shot of screenshots) {
+        shot.style.opacity = 1;
+        await new Promise(r => setTimeout(r, 4000));
       }
     }
 
-    function showScreenshots() {
-      let screenshotIndex = 0;
-      function showNext() {
-        if (screenshotIndex < screenshots.length) {
-          const shot = screenshots[screenshotIndex];
-          shot.style.opacity = 1;
-          screenshotIndex++;
-          setTimeout(showNext, 4000);
-        } else {
-          showFinalLine();
-        }
-      }
-      showNext();
-    }
-
-    function showFinalLine() {
+    async function showFinalLineAndScary() {
+      // Red final line
       const finalEl = document.createElement("div");
       finalEl.className = "line red";
       finalEl.textContent = finalLine;
       messageDiv.appendChild(finalEl);
       setTimeout(() => { finalEl.style.opacity = 1; }, 100);
 
-      setTimeout(showScaryImage, 2000); // Show scary zoom after red line
-    }
+      await new Promise(r => setTimeout(r, 2000));
 
-    function showScaryImage() {
+      // Scary zoom + shake
       scaryImg.style.opacity = 1;
       scaryImg.style.transform = "scale(5)";
-      scaryImg.style.animation = "shake 0.5s";
+      scaryImg.style.animation = "shake 1s"; // longer shake for more impact
     }
 
-    showLine();
+    // Run the sequence
+    (async function main() {
+      await showLines();
+      await waitForInput();
+      await showScreenshots();
+      await showFinalLineAndScary();
+    })();
   </script>
 </body>
 </html>
