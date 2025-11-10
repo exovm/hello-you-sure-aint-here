@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Hello</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: white;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .line {
+      opacity: 0;
+      transition: opacity 1s;
+      margin: 10px 0;
+      font-size: 2rem;
+      text-align: center;
+    }
+
+    .red {
+      color: red;
+    }
+
+    input {
+      margin-top: 20px;
+      padding: 10px;
+      font-size: 1rem;
+      display: none;
+    }
+
+    img.screenshot, #scaryImg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 1s;
+      z-index: -1;
+    }
+
+    #scaryImg {
+      z-index: 10;
+      transform: scale(0);
+      transition: transform 0.5s ease-in, opacity 0.5s ease-in;
+    }
+
+    /* Shake animation */
+    @keyframes shake {
+      0% { transform: scale(5) translate(0, 0); }
+      10% { transform: scale(5) translate(-20px, 20px); }
+      20% { transform: scale(5) translate(20px, -20px); }
+      30% { transform: scale(5) translate(-20px, 20px); }
+      40% { transform: scale(5) translate(20px, -20px); }
+      50% { transform: scale(5) translate(-10px, 10px); }
+      60% { transform: scale(5) translate(10px, -10px); }
+      70% { transform: scale(5) translate(-5px, 5px); }
+      80% { transform: scale(5) translate(5px, -5px); }
+      90% { transform: scale(5) translate(-2px, 2px); }
+      100% { transform: scale(5) translate(0, 0); }
+    }
+  </style>
+</head>
+<body>
+  <div id="message"></div>
+  <input id="response" placeholder="Type how you feel">
+
+  <img src="{715D94BA-6C2F-4EB6-820A-BC48871CA55C}.png" class="screenshot" id="shot1">
+  <img src="{6539B832-96DA-4AFA-A475-A165FC89CD1C}.png" class="screenshot" id="shot2">
+  <img src="{E0D38103-0006-4521-9052-E750E9923030}.png" class="screenshot" id="shot3">
+  <img src="{4FAA255A-86AD-439C-B2A5-42E3D332F2EE}.png" class="screenshot" id="shot4">
+
+  <!-- Scary zoom-in image -->
+  <img src="30743c18eb35d90e85f978efbf47390f.webp" id="scaryImg">
+
+  <script>
+    const lines = [
+      "I bet you wondered why you clicked on this link.",
+      "Hello Michael Moore 2777.",
+      "How are you?"
+    ];
+
+    const finalLine = "You thought you could run, I'm back";
+
+    const screenshots = [
+      document.getElementById("shot1"),
+      document.getElementById("shot2"),
+      document.getElementById("shot3"),
+      document.getElementById("shot4")
+    ];
+
+    const scaryImg = document.getElementById("scaryImg");
+    const messageDiv = document.getElementById("message");
+    const inputBox = document.getElementById("response");
+    let lineIndex = 0;
+    let screenshotIndex = 0;
+
+    function showLine() {
+      if (lineIndex < lines.length) {
+        const lineEl = document.createElement("div");
+        lineEl.className = "line";
+        lineEl.textContent = lines[lineIndex];
+        messageDiv.appendChild(lineEl);
+
+        setTimeout(() => { lineEl.style.opacity = 1; }, 100);
+
+        lineIndex++;
+        setTimeout(showLine, 2000);
+      } else {
+        inputBox.style.display = "block";
+        inputBox.focus();
+        setTimeout(showScreenshot, 2000);
+      }
+    }
+
+    function showScreenshot() {
+      if (screenshotIndex < screenshots.length) {
+        const shot = screenshots[screenshotIndex];
+        shot.style.opacity = 1;
+        screenshotIndex++;
+        setTimeout(showScreenshot, 4000);
+      } else {
+        showFinalLine();
+      }
+    }
+
+    function showFinalLine() {
+      const finalEl = document.createElement("div");
+      finalEl.className = "line red";
+      finalEl.textContent = finalLine;
+      messageDiv.appendChild(finalEl);
+      setTimeout(() => { finalEl.style.opacity = 1; }, 100);
+
+      setTimeout(showScaryImage, 2000); // Show scary zoom after red line
+    }
+
+    function showScaryImage() {
+      scaryImg.style.opacity = 1;
+      scaryImg.style.transform = "scale(5)"; 
+      scaryImg.style.animation = "shake 0.5s"; // Rapid shake
+    }
+
+    showLine();
+  </script>
+</body>
+</html>
