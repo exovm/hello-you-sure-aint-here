@@ -54,7 +54,6 @@
       transition: transform 0.5s ease-in, opacity 0.5s ease-in;
     }
 
-    /* Shake animation */
     @keyframes shake {
       0% { transform: scale(5) translate(0, 0); }
       10% { transform: scale(5) translate(-20px, 20px); }
@@ -79,7 +78,6 @@
   <img src="{E0D38103-0006-4521-9052-E750E9923030}.png" class="screenshot" id="shot3">
   <img src="{4FAA255A-86AD-439C-B2A5-42E3D332F2EE}.png" class="screenshot" id="shot4">
 
-  <!-- Scary zoom-in image -->
   <img src="30743c18eb35d90e85f978efbf47390f.webp" id="scaryImg">
 
   <script>
@@ -102,7 +100,6 @@
     const messageDiv = document.getElementById("message");
     const inputBox = document.getElementById("response");
     let lineIndex = 0;
-    let screenshotIndex = 0;
 
     function showLine() {
       if (lineIndex < lines.length) {
@@ -116,21 +113,33 @@
         lineIndex++;
         setTimeout(showLine, 2000);
       } else {
+        // After all lines, show input for typing first
         inputBox.style.display = "block";
         inputBox.focus();
-        setTimeout(showScreenshot, 2000);
+
+        inputBox.addEventListener("keydown", function(e) {
+          if (e.key === "Enter" && inputBox.value.trim() !== "") {
+            inputBox.disabled = true; // prevent more typing
+            inputBox.style.opacity = 0.5;
+            setTimeout(showScreenshots, 500); // start screenshots after typing
+          }
+        });
       }
     }
 
-    function showScreenshot() {
-      if (screenshotIndex < screenshots.length) {
-        const shot = screenshots[screenshotIndex];
-        shot.style.opacity = 1;
-        screenshotIndex++;
-        setTimeout(showScreenshot, 4000);
-      } else {
-        showFinalLine();
+    function showScreenshots() {
+      let screenshotIndex = 0;
+      function showNext() {
+        if (screenshotIndex < screenshots.length) {
+          const shot = screenshots[screenshotIndex];
+          shot.style.opacity = 1;
+          screenshotIndex++;
+          setTimeout(showNext, 4000);
+        } else {
+          showFinalLine();
+        }
       }
+      showNext();
     }
 
     function showFinalLine() {
@@ -145,8 +154,8 @@
 
     function showScaryImage() {
       scaryImg.style.opacity = 1;
-      scaryImg.style.transform = "scale(5)"; 
-      scaryImg.style.animation = "shake 0.5s"; // Rapid shake
+      scaryImg.style.transform = "scale(5)";
+      scaryImg.style.animation = "shake 0.5s";
     }
 
     showLine();
